@@ -1,55 +1,69 @@
 import java.util.*;
-import enums.*;
+
+import com.rental.enums.*;
+import com.rental.utils.IOUtility;
 public class VehicleRentingSystem {
 
 	static ArrayList<Car> cars = new ArrayList<Car>();
 	static ArrayList<Bus> buses = new ArrayList<Bus>();
 	static ArrayList<Truck> trucks = new ArrayList<Truck>();
-	static IOUtility ioObject = new IOUtility();
 
-
-	public static void addVehicle(int regNo, int rental, String name, String cat) {
-	
-		switch(VehicleCategory.valueOf(cat)) {
+	public static void addVehicle(VehicleDetails v) throws Exception {	
+		switch(VehicleCategory.valueOf(v.category)) {
 		case CAR:
-			Car car = new Car(regNo, rental, name);
+			Car car = new Car(v.registrationNumber, v.rental, v.vehicleName);
 			cars.add(car);
 			break;
 		case BUS:
-			Bus bus = new Bus(regNo, rental, name);
+			Bus bus = new Bus(v.registrationNumber, v.rental, v.vehicleName);
 			buses.add(bus);
 			break;
 		case TRUCK:
-			Truck truck = new Truck(regNo, rental, name);
+			Truck truck = new Truck(v.registrationNumber, v.rental, v.vehicleName);
 			trucks.add(truck);
 			break;
 		}
 	}
 	
-	public static boolean checkCategory(String cat) {
-		if(!cat.equals("CAR") && !cat.equals("BUS") && !cat.equals("TRUCK")) {
-			return false;
-		}
-		return true;
-	}
 	
-	public static Object findVehicle(int regNo,String cat) {
-		if(!VehicleRentingSystem.checkCategory(cat)) {
-			System.out.println("Invalid category");
-			return null;
-		}
-		switch(VehicleCategory.valueOf(cat)) {
+	public static Vehicle findVehicle(VehicleDetails v) throws Exception {
+		switch(VehicleCategory.valueOf(v.category)) {
 		case CAR:
-			return cars.stream().filter(c->c.registrationNumber==regNo).findAny();
+			return cars.stream().filter(c->c.registrationNumber==v.registrationNumber).findAny().orElseThrow();
 		case BUS:
-			return buses.stream().filter(c->c.registrationNumber==regNo).findAny();
+			return buses.stream().filter(c->c.registrationNumber==v.registrationNumber).findAny().orElseThrow();
 		case TRUCK:
-			return trucks.stream().filter(c->c.registrationNumber==regNo).findAny();
+			return trucks.stream().filter(c->c.registrationNumber==v.registrationNumber).findAny().orElseThrow();
 		}
-		return false;
+		return new Vehicle();
 	}
 	
-	public static void bookVehicle(int regNo,String cat,Vehicle vehicle) {
+	
+	
+	public static void bookVehicle(VehicleDetails v) throws Exception {
+		Vehicle vehicle = VehicleRentingSystem.findVehicle(v);
+		System.out.println(vehicle+"\nEnter time to book vehicle ");
+		SlotTiming time = SlotTiming.valueOf(IOUtility.getStringInput().toUpperCase());
+		if(!vehicle.availabilityDetails.get(time))
+			System.out.println("Vehicle in this slot already booked ");
+		else
+		{
+			vehicle.availabilityDetails.put(time, false);
+			System.out.println("Vehicle booked at "+time);
+		}
 		
+	}
+	
+	public static void unbookVehicle(VehicleDetails v) throws Exception {
+		Vehicle vehicle = VehicleRentingSystem.findVehicle(v);
+		System.out.println(vehicle+"\nEnter time to free vehicle ");
+		SlotTiming time = SlotTiming.valueOf(IOUtility.getStringInput().toUpperCase());
+		if(vehicle.availabilityDetails.get(time))
+			System.out.println("Vehicle in this slot already available ");
+		else
+		{
+			vehicle.availabilityDetails.put(time, true);
+			System.out.println("Vehicle unbooked at "+time);
+		}
 	}
 }

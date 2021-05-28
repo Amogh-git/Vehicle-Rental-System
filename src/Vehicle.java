@@ -1,9 +1,14 @@
 import java.util.*;
-import enums.*;
+import com.rental.enums.*;
 public class Vehicle {
 	int registrationNumber,rental;
 	String vehicleName;
 	HashMap<SlotTiming, Boolean> availabilityDetails = new HashMap<SlotTiming, Boolean>();
+	Vehicle(){
+		this.registrationNumber=0;
+		this.rental = 0;
+		this.vehicleName = "";
+	}
 	Vehicle(int registrationNumber, int rental, String vehicleName){
 		this.registrationNumber = registrationNumber;
 		this.vehicleName = vehicleName;
